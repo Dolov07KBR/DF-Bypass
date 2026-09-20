@@ -54,6 +54,15 @@ grep -q "^#v7$" "$ZB_CONF" && ! grep -q "^#DFB1$" "$ZB_CONF"
 check "uninstall восстанавливает исходную стратегию" $?
 
 rm -rf "$T"
+echo "3. StrWhatsapp — файл для оригинального Zapret-Manager"
+SW="files/zapret-manager/StrWhatsapp"
+[ -s "$SW" ]; check "файл стратегий существует" $?
+grep -qE "^#Yv9[0-9]$" "$SW"; check "маркеры в нативном формате #YvNN" $?
+awk 'NR>1 && /^#/ && !/^#Yv[0-9]+$/{bad=1} END{exit bad}' "$SW"
+check "в теле блоков нет комментариев (формат читаем оригиналом)" $?
+grep -q "ipset=/opt/zapret/ipset/ipset-whatsapp.txt" "$SW" && [ -s files/zapret-manager/ipset-whatsapp.txt ]
+check "стратегии ссылаются на ipset-файл и он приложен" $?
+
 echo ""
 echo "============================================================"
 echo "ИТОГО: $PASS успешно, $FAIL ошибок"
