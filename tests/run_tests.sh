@@ -60,8 +60,8 @@ SW="files/zapret-manager/StrWhatsapp"
 grep -qE "^#Yv9[0-9]$" "$SW"; check "маркеры в нативном формате #YvNN" $?
 awk 'NR>1 && /^#/ && !/^#Yv[0-9]+$/{bad=1} END{exit bad}' "$SW"
 check "в теле блоков нет комментариев (формат читаем оригиналом)" $?
-grep -q "ipset=/opt/zapret/ipset/ipset-whatsapp.txt" "$SW" && [ -s files/zapret-manager/ipset-whatsapp.txt ]
-check "стратегии ссылаются на ipset-файл и он приложен" $?
+grep -qE -- "--ipset-ip=31\.13\.64\.0/18.*157\.240\.0\.0/16" "$SW"
+check "диапазоны Meta вшиты в стратегии (--ipset-ip, файл самодостаточный)" $?
 
 echo ""
 echo "============================================================"

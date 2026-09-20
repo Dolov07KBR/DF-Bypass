@@ -77,14 +77,14 @@ Zapret-Manager при этом не трогается.
 - `files/zapret-manager/StrWhatsapp` — 5 вариантов обхода (`#Yv90`–`#Yv94`):
   `split2+seqovl=681`, `hostfakesplit`, `fake,split2+badseq`, комбо
   «сообщения + звонки + медиа», `multisplit+QUIC`;
-- `files/zapret-manager/ipset-whatsapp.txt` — IP-диапазоны
-  WhatsApp (префиксы Meta AS32934) для точечного применения.
+- IP-диапазоны WhatsApp (префиксы Meta: 31.13.64.0/18, 57.144.0.0/14,
+  129.134.0.0/17, 157.240.0.0/16, 163.70.128.0/17) вшиты прямо в стратегии
+  через `--ipset-ip=` — **никаких дополнительных файлов не нужно**.
+  (`ipset-whatsapp.txt` оставлен для тех, кто предпочитает `--ipset=<файл>`.)
 
-**Интеграция (две команды на роутере):**
+**Интеграция — одна команда на роутере:**
 
 ```sh
-mkdir -p /opt/zapret/ipset
-wget -qO /opt/zapret/ipset/ipset-whatsapp.txt 'https://raw.githubusercontent.com/Dolov07KBR/DF-Bypass/main/files/zapret-manager/ipset-whatsapp.txt'
 wget -qO /root/custom_test.txt 'https://raw.githubusercontent.com/Dolov07KBR/DF-Bypass/main/files/zapret-manager/StrWhatsapp'
 ```
 
@@ -95,6 +95,24 @@ wget -qO /root/custom_test.txt 'https://raw.githubusercontent.com/Dolov07KBR/DF-
 Вручную конкретный блок можно дописать в конец `option NFQWS_OPT` в
 `/etc/config/zapret` перед закрывающей кавычкой — формат строк тот же, что у
 штатных стратегий менеджера.
+
+### ⚠️ Как читать общий тест и проверять правильно
+
+Общий тест менеджера гоняет ~60 URL (instagram, discord, торренты, зарубежные
+серверы и т.п.). Обход «только для WhatsApp» точечный — он трогает **только**
+диапазоны Meta, поэтому дискорд/торренты/прочее на нём падает по определению
+(для всего разом — пункт 11 «DF-Bypass» в PLUS или полный DF-Bypass).
+
+Правильная проверка именно этого обхода:
+
+```sh
+curl -m 10 -sI https://web.whatsapp.com | head -3   # с роутера
+ps | grep nfqws                                      # демон запущен?
+```
+
+…и главное — приложение на телефоне: сообщения и звонки. Если не работает —
+проверьте, что в роутере выключен Flow Offloading (иначе десинк не видит
+трафик, особенно по Wi-Fi).
 
 ## 📶 Wi-Fi и низкая задержка
 
