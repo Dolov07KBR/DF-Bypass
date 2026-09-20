@@ -54,7 +54,39 @@ grep -q "^#v7$" "$ZB_CONF" && ! grep -q "^#DFB1$" "$ZB_CONF"
 check "uninstall восстанавливает исходную стратегию" $?
 
 rm -rf "$T"
-echo "3. StrWhatsapp — файл для оригинального Zapret-Manager"
+echo "3. whatsapp.sh — самостоятельный скрипт обхода"
+sh -n whatsapp.sh
+check "whatsapp.sh проходит sh -n" $?
+T2="$(mktemp -d)"
+export WA_HOME="$T2/wa" WA_CONF="$T2/zapret.conf"
+cat > "$WA_CONF" <<'EOF'
+config zapret
+	option enabled '1'
+	option NFQWS_PORTS_UDP '443,50000-50100'
+	option NFQWS_PORTS_TCP '80,443'
+#v7
+--filter-tcp=80,443 --dpi-desync=fake,split
+--new
+EOF
+sh whatsapp.sh >/dev/null 2>&1
+check "whatsapp.sh применил обход" $?
+grep -q "^#DFB9$" "$WA_CONF" && grep -q "ipset-ip=31.13.64.0/18" "$WA_CONF"
+check "блок #DFB9 с вшитыми диапазонами записан" $?
+grep -q -- "--dpi-desync=fake,split" "$WA_CONF"
+check "прежняя стратегия сохранена после обхода" $?
+grep -q "590-1400" "$WA_CONF" && grep -q "5222" "$WA_CONF"
+check "порты для звонков/мессенджера дописаны" $?
+[ -f "$WA_HOME/backup/original.conf" ]
+check "резервная копия создана" $?
+sh whatsapp.sh --uninstall >/dev/null 2>&1
+grep -q "^#v7$" "$WA_CONF" && ! grep -q "^#DFB9$" "$WA_CONF"
+check "whatsapp.sh --uninstall вернул исходный конфиг" $?
+# повторное применение после отката (идемпотентность бэкапа)
+sh whatsapp.sh >/dev/null 2>&1 && grep -q "^#DFB9$" "$WA_CONF"
+check "повторное применение работает" $?
+rm -rf "$T2"; unset WA_HOME WA_CONF
+
+echo "4. StrWhatsapp — файл для оригинального Zapret-Manager"
 SW="files/zapret-manager/StrWhatsapp"
 [ -s "$SW" ]; check "файл стратегий существует" $?
 grep -qE "^#Yv9[0-9]$" "$SW"; check "маркеры в нативном формате #YvNN" $?

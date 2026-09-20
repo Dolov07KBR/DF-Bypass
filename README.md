@@ -67,34 +67,37 @@ Zapret-Manager при этом не трогается.
 - `lists/telegram.hosts`, `lists/ai.hosts` — домены для SNI-фильтров;
 - `files/` — fake-пакеты QUIC/TLS (из bol-van/zapret), чтобы обман DPI выглядел как обычный трафик.
 
-## 📱 Отдельный обход только для WhatsApp — файл для Zapret-Manager
+## 📱 Отдельный обход только для WhatsApp
 
-Если нужен **только WhatsApp**, без всего остального — в репозитории лежит
-готовый файл в нативном формате оригинального
-[Zapret-Manager](https://github.com/StressOzz/Zapret-Manager)
-(как его `StrYoutube` / `/root/custom_test.txt`):
+### Способ 1 (рекомендуемый): скрипт `whatsapp.sh` — всё делает сам
 
-- `files/zapret-manager/StrWhatsapp` — 5 вариантов обхода (`#Yv90`–`#Yv94`):
-  `split2+seqovl=681`, `hostfakesplit`, `fake,split2+badseq`, комбо
-  «сообщения + звонки + медиа», `multisplit+QUIC`;
-- IP-диапазоны WhatsApp (префиксы Meta: 31.13.64.0/18, 57.144.0.0/14,
-  129.134.0.0/17, 157.240.0.0/16, 163.70.128.0/17) вшиты прямо в стратегии
-  через `--ipset-ip=` — **никаких дополнительных файлов не нужно**.
-  (`ipset-whatsapp.txt` оставлен для тех, кто предпочитает `--ipset=<файл>`.)
+```sh
+sh <(wget -qO - 'https://raw.githubusercontent.com/Dolov07KBR/DF-Bypass/main/whatsapp.sh')
+```
 
-**Интеграция — одна команда на роутере:**
+Скрипт сам:
+- проверит наличие zapret и докачает нужные фейк-файлы;
+- встроит обход (`#DFB9`) **в начало цепочки**, а вашу текущую стратегию
+  сохранит после него — остальной трафик работает как раньше;
+- диапазоны Meta вшиты прямо в стратегию (`--ipset-ip=`), внешние файлы не нужны;
+- добавит порты для звонков (`590-1400,3478,3482`) и порт мессенджера `5222`;
+- отключит Flow Offloading, если он включён (главная причина «не работает по Wi-Fi»);
+- перезапустит zapret и сразу проверит доступность `web.whatsapp.com`.
+
+Откат: `sh <(wget -qO - '.../whatsapp.sh') -- --uninstall` · проверка: `-- --status`
+
+### Способ 2: файл для меню Zapret-Manager
+
+`files/zapret-manager/StrWhatsapp` — 5 вариантов (`#Yv90`–`#Yv94`) в нативном
+формате менеджера (как `StrYoutube` / `/root/custom_test.txt`):
 
 ```sh
 wget -qO /root/custom_test.txt 'https://raw.githubusercontent.com/Dolov07KBR/DF-Bypass/main/files/zapret-manager/StrWhatsapp'
 ```
 
-Далее в меню Zapret-Manager: **Стратегии → стратегии для YouTube → 3) Тестировать
-стратегии из /root/custom_test.txt** — переберите варианты, рабочий применится
-к вашей текущей стратегии отдельным блоком `--new` (основной обход не ломается).
-
-Вручную конкретный блок можно дописать в конец `option NFQWS_OPT` в
-`/etc/config/zapret` перед закрывающей кавычкой — формат строк тот же, что у
-штатных стратегий менеджера.
+Затем: **Стратегии → для YouTube → 3) Тестировать стратегии из /root/custom_test.txt**.
+Рабочий вариант применится к текущей стратегии отдельным блоком `--new`.
+(В Zapret Manager PLUS это пункт меню **11 → 4**.)
 
 ### ⚠️ Как читать общий тест и проверять правильно
 
