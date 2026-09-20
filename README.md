@@ -32,15 +32,24 @@ sh <(wget -qO - 'https://raw.githubusercontent.com/Dolov07KBR/DF-Bypass/main/app
 sh <(wget -qO - 'https://raw.githubusercontent.com/Dolov07KBR/DF-Bypass/main/apply.sh')
 ```
 
-Откат в один шаг:
+Из Zapret Manager PLUS это пункт меню **11) DF-Bypass**.
+
+## ❌ Откат и удаление
+
+Вернуть прежнюю стратегию (файлы профиля остаются, можно применить снова):
 
 ```sh
 sh <(wget -qO - 'https://raw.githubusercontent.com/Dolov07KBR/DF-Bypass/main/uninstall.sh')
 ```
 
-возвращает вашу прежнюю стратегию (она сохраняется в `backup/original.conf` и
-остаётся в конце цепочки как catch-all). Из Zapret Manager PLUS это пункт меню
-**11) DF-Bypass**.
+Полное удаление — откат стратегии **и** стирание всех файлов (`/opt/df-bypass`):
+
+```sh
+sh <(wget -qO - 'https://raw.githubusercontent.com/Dolov07KBR/DF-Bypass/main/uninstall.sh') -- --purge
+```
+
+Обе команды перезапускают службу zapret автоматически; оригинальный
+Zapret-Manager при этом не трогается.
 
 ## 🧠 Что внутри и почему это работает
 
