@@ -1,0 +1,8 @@
+# --- DF-Bypass: базовый низкозадержечный catch-all (в конце цепочки) ---
+# Применяется к остальному трафику из пользовательского hostlist оригинала.
+# autottl=2 + badseq: минимальная цена обмана DPI по задержке.
+--filter-tcp=80 --dpi-desync=fake,multisplit --dpi-desync-autottl=2 --dpi-desync-fooling=md5sig
+--new
+--filter-tcp=443 --dpi-desync=fake,multidisorder --dpi-desync-split-pos=1,midsld --dpi-desync-repeats=5 --dpi-desync-fooling=badseq
+--new
+--filter-udp=443 --dpi-desync=fake --dpi-desync-repeats=5 --dpi-desync-fake-quic=@ZB@/files/quic_initial_www_google_com.bin

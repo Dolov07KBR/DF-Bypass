@@ -1,0 +1,12 @@
+# --- DF-Bypass: игровой трафик (новый универсальный обход, низкая задержка) ---
+# Discord-медиа и STUN (рабочая база из bol-van/zapret #168/#1860)
+--filter-udp=19294-19344,50000-50100 --filter-l7=discord,stun --dpi-desync=fake --dpi-desync-repeats=6 --dpi-desync-fake-quic=@ZB@/files/quic_initial_www_google_com.bin
+--new
+# Высокие UDP-порты (P2P/голос/матчмейкинг): fake+tamper по любому протоколу
+--filter-udp=50000-65535 --dpi-desync=fake,tamper --dpi-desync-any-protocol --dpi-desync-fake-quic=@ZB@/files/quic_initial_www_google_com.bin
+--new
+# Типовые игровые UDP-порты (Roblox, GTA, Apex, BF, CoD, PSN, Steam): минимум повторов = минимум задержки
+--filter-udp=3074,3478-3479,3658,6672,61455-61457,37000-40000,49152-49999 --dpi-desync=fake --dpi-desync-repeats=2 --dpi-desync-fake-quic=@ZB@/files/quic_initial_www_google_com.bin
+--new
+# Игровые TCP: лёгкий desync с autottl=2 (не добавляет задержку)
+--filter-tcp=3074,3478-3479,3658,6672,27015-27030 --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=badseq --dpi-desync-badseq-increment=2

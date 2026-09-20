@@ -1,0 +1,9 @@
+# --- DF-Bypass: Telegram (сообщения, медиа, звонки) ---
+# Сообщения/медиа: TCP по ipset Telegram, низкая задержка (autottl=2, без тяжёлых repeats)
+--filter-tcp=80,443 --hostlist=@ZB@/lists/telegram.hosts --ipset=@ZB@/ipsets/telegram.cidr --dpi-desync=fake,split2 --dpi-desync-autottl=2 --dpi-desync-fooling=badseq --dpi-desync-badseq-increment=2 --dpi-desync-fake-tls=@ZB@/files/tls_clienthello_www_google_com.bin
+--new
+# Медиа/QUIC по ipset
+--filter-udp=443 --ipset=@ZB@/ipsets/telegram.cidr --dpi-desync=fake --dpi-desync-repeats=5 --dpi-desync-fake-quic=@ZB@/files/quic_initial_www_google_com.bin
+--new
+# Голосовые звонки: STUN/медиа-порты (рабочая схема из bol-van/zapret #1668, #1860)
+--filter-udp=590-1400,3478 --filter-l7=stun --dpi-desync=fake --dpi-desync-fake-quic=@ZB@/files/quic_initial_www_google_com.bin

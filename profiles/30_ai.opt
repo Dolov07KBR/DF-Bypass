@@ -1,0 +1,4 @@
+# --- DF-Bypass: заблокированные AI-сервисы (ChatGPT, Claude, Gemini, Copilot...) ---
+# DPI режет по SNI в ClientHello: fake+split2 с разрезом внутри SNI (sniext),
+# ttl=4 — баланс надёжности и задержки (схемы из рабочих подборок 2025-2026)
+--filter-tcp=443 --hostlist=@ZB@/lists/ai.hosts --dpi-desync=fake,split2 --dpi-desync-split-seqovl=1 --dpi-desync-split-tls=sniext --dpi-desync-fake-tls=@ZB@/files/tls_clienthello_www_google_com.bin --dpi-desync-ttl=4

@@ -1,0 +1,9 @@
+# --- DF-Bypass: WhatsApp (мессенджер + звонки) ---
+# TCP: split2 с seqovl=681 и паттерном (рабочая схема из bol-van/zapret #1908, 2025-2026)
+--filter-tcp=443,5222 --ipset=@ZB@/ipsets/whatsapp.cidr --dpi-desync=split2 --dpi-desync-split-seqovl=681 --dpi-desync-split-pos=1,midsld --dpi-desync-split-seqovl-pattern=@ZB@/files/tls_clienthello_www_google_com.bin
+--new
+# UDP/QUIC: fake с repeats=11 и cutoff=d4 (звонки и медиа)
+--filter-udp=443 --ipset=@ZB@/ipsets/whatsapp.cidr --dpi-desync=fake --dpi-desync-repeats=11 --dpi-desync-any-protocol --dpi-desync-cutoff=d4 --dpi-desync-fake-quic=@ZB@/files/quic_initial_www_google_com.bin
+--new
+# Звонки WhatsApp: STUN-порты
+--filter-udp=590-1400,3478,3482 --filter-l7=stun --dpi-desync=fake --dpi-desync-fake-quic=@ZB@/files/quic_initial_www_google_com.bin
